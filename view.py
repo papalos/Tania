@@ -1,6 +1,7 @@
 from tkinter import filedialog
 from tkinter import *
 from emailer import Mailer
+import time
 
 ml = Mailer()
 
@@ -67,14 +68,18 @@ def get_file():
 
 
 def send_mail():
-    global msg
-    global file_path
-    ml.read_setup()
+    global msg                                                        # Переменная для выводимого в окно сообщения
+    global file_path                                                  # Путь до файла с рассылкой
+    ml.read_setup()                                                   # Читаем файл настройки
     try:
-        ml.spam(file_path.get())
-        msg.set('Рассылка отправлена!')
+        a = ml.spam(file_path.get())                                  # Получаем генератор из функции рассылки
+        for i in a:                                                   # Выполняем пошагово генератор и получаем последний отправленный адресс
+            msg.set(i)                                                # Устанавливаем текст сообщения для вывода
+            root.update()                                             # Обновляем главное окно программы для отображения изменений в сообщении
+        msg.set('Рассылка отправлена!')                               # По завершению отправки меняем текст сообщения на финальный
     except Exception as e:
-        msg.set(str(e))
+        msg.set('Ошибка! Последний адрес отправки: ' + i)
+
 
 
 root = Tk()
@@ -102,6 +107,7 @@ button_file.grid(row=1, column=2)
 # # date_entry = Entry(textvariable=date_doc)
 # # date_entry.grid(row=3, column=2)
 
+# Запускаем рассылку
 button_send = Button(text="Отправить рассылку", command=send_mail)
 button_send.grid(row=2, column=1)
 

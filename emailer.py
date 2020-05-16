@@ -57,12 +57,14 @@ class Mailer:
         server.sendmail(self.email, destination, msg.as_string())
         server.quit()
 
-    def spam(self, data_file):
-        with open(data_file, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=';')
-            for row in spamreader:
-                if '@' in row[0]:
-                    self.send_email(row[0], row[1], row[2], row[3])
+
+    def spam(self, data_file):                                         # Функция-генератор получает файл с рассылкой
+        with open(data_file, newline='') as csvfile:                   # Открываем файл с рассылкой
+            spamreader = csv.reader(csvfile, delimiter=';')            # Читаем полностью файл, разбивая строки на элементы по разделителю
+            for row in spamreader:                                     # Читаем каждую строку
+                if '@' in row[0]:                                      # проверяем содержит ли первый элемент строки символ электронной почты
+                    self.send_email(row[0], row[1], row[2], row[3])    # выплняем отправку сообщения по этому адресу
+                    yield row[0]                                       # приостанавлеиваем генератор, и передаем управление вызвавшей его программе
 
 
 if __name__ == '__main__':
